@@ -62,7 +62,7 @@ source('./Code/file-merger.R')
 # create data frame
   # note that directory is defined in file_merger.R file
   # change data file path in that script to modify the data source
-dat <- returnAllFiles(d = directory, export = FALSE)
+dat <- returnAllFiles(d = directory, export = TRUE)
 dat2 <- dat
 # make columns lowercase so they are all the same case
 colnames(dat) <- tolower(names(dat))
