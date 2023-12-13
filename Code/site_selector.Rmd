@@ -1,0 +1,512 @@
+---
+title: "Site selector data visualization tool"
+author: "Molly 'Caz' Bell and A.J. Brown using R version 4.2.2"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    output_dir: "site_selector_temporary_results"
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+The following is an interactive data report containing water quality data from 
+samples taken by the Colorado State University (CSU) Agriculture Water Quality 
+Program (AWQP) at a location selected by the user when running the script
+(reported below). For more information, please contact A.J. Brown at
+Ansley.Brown@colostate.edu or visit the CSU AWQP Website at 
+https://waterquality.colostate.edu.
+
+**Please Note:** All analytes are reported in mg/L *EXCEPT*
+selenium (reported in ug/L), specific electrical conductivity (EC; mS/cm), and
+pH (log H).
+
+## Special Notes
+
+*	All “0” values reported are non-detects (ND) reported by ALS
+*	Total suspended solids (TSS), Electrical Conductivity (EC), and pH are performed by AWQP staff at CSU, whereas all other analytes are reported by ALS Laboratories
+*	Methods used to derive each analyte can be found in the Raw Data table in the “method” column
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# set working dir
+knitr::opts_knit$set(root.dir = here::here())
+   # sets the working directory to where the project file is
+```
+
+```{r, include=FALSE}
+# load required packages
+package.list <- c('plotly',
+                  'dplyr',
+                  'tidyr',
+                  'DT',
+                  'ggplot2'
+                  # 'gridExtra',
+                  # 'GGally',
+                  # 'PerformanceAnalytics'
+                  )
+packageLoad <- function(packages){
+  for (i in packages) {
+    if (!require(i, character.only = TRUE)) {
+      install.packages(i, repos = "http://cran.us.r-project.org")
+      library(i, character.only = TRUE)
+    }
+  }
+}
+packageLoad(package.list)
+```
+
+```{r, include=FALSE}
+# Uploading file-merge code to create data frame
+source('./Code/file-merger.R')
+# create data frame
+  # note that directory is defined in file_merger.R file
+  # change data file path in that script to modify the data source
+dat <- returnAllFiles(d = directory, export = FALSE)
+dat2 <- dat
+# make columns lowercase so they are all the same case
+colnames(dat) <- tolower(names(dat))
+unique(dat$location.name)
+```
+
+```{r, include=FALSE}
+# Site list
+  # To select site, un-comment your location of interest (alphabetical order)
+  # This list may need to be updated as more sites are added/removed
+ loc = 'ARDEC' #temporarily ARDEC 2200 until I fix file-merger.r
+# loc = 'AVRC STAR'
+# loc = 'Barley'
+# loc = 'Berthoud'
+# loc = 'Big Hollow'
+# loc = 'Boulder Lake'
+# loc = 'Below Stagecoach Dam'
+# loc = 'Gunnison'
+# loc = 'Kerbel'
+# loc = 'Legacy'
+# loc = 'Molina'
+# loc = 'Morrison Creek'
+# loc = 'Stage Coach Above'
+# loc = 'Stage Coach In'
+# loc = 'Stagecoach'
+# loc = 'The Ranch'
+# loc = 'Upper Yampa'
+# loc = 'Yellow Jacket'
+
+#create a filtered df to use for violin plots and scatterplot
+filter_dataframe <- function(df, selected_location, include_blanks = FALSE) {
+  if (include_blanks) {
+    filtered_df <- df %>% filter(location.name == selected_location)
+  } else {
+    filtered_df <- df %>% filter(location.name == selected_location & event.type != "Lab Blank")
+  }
+  return(filtered_df)
+}
+
+# Create df and exclude blanks by default:
+filtered_df <- filter_dataframe(dat, loc, include_blanks = FALSE)
+```
+
+
+## Location Selected: <span style="color:#4CAF50">`r loc`</span>
+
+```{r, include=FALSE}
+# function to save site data as csv
+csv_data <- function(df, location_name) {
+  location_data <- df %>%
+    filter(location.name == location_name)
+  #create output folder
+  folder_name <- "site_selector_temporary_results"
+  if (!file.exists(folder_name)) {
+    dir.create(folder_name)
+  }
+  
+  file_name <- paste0(folder_name, "/", location_name, "_data_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
+  write.csv(location_data, file = file_name, row.names = FALSE)
+  return(file_name)
+}
+# use the function to save
+file = csv_data(filtered_df, loc)
+```
+
+```{r}
+# Creating some subset data for static graphing later
+analytes_plot1 <- c("Nitrogen, Nitrate (As N)", 
+                    "Nitrogen, Nitrite  (As N)", # note the extra space before "(" due to ALS formatting
+                    "Nitrogen, Total Kjeldahl")
+analytes_plot2 <- c("Phosphorus, Total (As P)", 
+                    "Phosphorus, Total Orthophosphate (as P)",
+                    "Suspended Solids (Residue, Non-Filterable)")
+analytes_plot3 <- setdiff(unique(filtered_df$analyte), c(analytes_plot1, analytes_plot2))
+N_df <- filtered_df %>% filter(analyte %in% analytes_plot1)
+P_df <- filtered_df %>% filter(analyte %in% analytes_plot2)
+Misc_df <- filtered_df %>% filter(analyte %in% analytes_plot3)
+```
+
+### CSV Export of selected site data saved as: 
+`r file`
+
+# Water Analytes Present and Methods Used for Determination:
+```{r}
+unique_analyte_method <- filtered_df %>%
+  select(analyte, method) %>%
+  distinct(analyte, method) %>%
+  arrange(analyte)
+
+# Print the table
+datatable(unique_analyte_method, 
+              caption = "Unique Analytes and Corresponding Methods")
+
+```
+
+
+# Interactive Violin Plot
+Use the below boxplot to graph various water analytes stratified by sample type
+(i.e., Inflow, Outflow, etc.). Analytes can be selected by using the dropdown 
+menu on the top left of the graph. Hover over points with your mouse for
+additional information.
+
+**PLEASE NOTE**: This initial graph will be incorrect (ongoing bug), use the
+dropdown menu to select a different analyte first, then go back to the initial
+analyte to see it displayed correctly.
+
+```{r, warning=FALSE}
+# Create the violin plot function
+create_violinplot <- function(df, selected_location) {
+  
+  tryCatch({
+    # Call the function to filter the Data
+    
+    y_axis_var_names <- sort(unique(df$analyte))
+    
+    # Specify event colors and types
+    event_colors <- c("Inflow" = "#E69F00", "Outflow" = "#56B4E9", "Point Sample" = "#009E73")
+    event_types <- c("Inflow", "Outflow", "Point Sample")
+    
+    # Create the buttons for the dropdown menu
+    dropdown_buttons <- lapply(unique(y_axis_var_names), function(analyte_name) {
+      y_data <- df$result[df$analyte == analyte_name]
+      y_range <- range(c(0, y_data), na.rm = TRUE)
+      
+      list(
+        method = 'restyle',
+        args = list('y', list(y_data)),
+        label = analyte_name,
+        args2 = list('yaxis.range', y_range)  # Update y-axis range
+      )
+    })
+    
+    location_violin_plot <- plot_ly(data = df,
+                                    x = ~event.type,
+                                    y = ~result,
+                                    color = ~event.type,
+                                    colors = event_colors,
+                                    type = 'violin', box = list(
+                                      visible = TRUE
+                                    ),
+                                    meanline = list(
+                                      visible = TRUE
+                                    )) %>%
+      layout(
+        title = paste("Violin plots for Location:", selected_location),
+        xaxis = list(title = "Event Type"),  # Update x-axis title
+        yaxis = list(title = "Result"),
+        showlegend = TRUE,
+        updatemenus = list(
+          list(
+            buttons = dropdown_buttons
+          )
+        )
+      )
+    
+    return(location_violin_plot)
+    
+  }, error = function(e) {
+    cat("An error occurred:", conditionMessage(e))
+    return(NULL)
+  })
+}
+
+# Call the create_violinplot function with your data and selected location
+create_violinplot(filtered_df, loc)
+
+```
+**To save your plot as a PNG:** hover over the top right corner and click
+the camera icon.  The PNG will be saved in your downloads folder.
+
+
+## Interactive Scatterplot Time Series
+Use the below boxplot to graph various water analytes stratified by sample type
+(i.e., Inflow, Outflow, etc.) as a time series. Analytes can be selected by 
+using the dropdown menu on the top left of the graph. Hover over points with 
+your mouse for additional information.
+
+**PLEASE NOTE**: This initial graph will be incorrect (ongoing bug), use the
+dropdown menu to select a different analyte first, then go back to the initial
+analyte to see it displayed correctly.
+
+```{r}
+# Function to create a scatter plot with dropdown
+create_scatterplot <- function(df, selected_location) {
+  
+  tryCatch({
+    y_axis_var_names <- sort(unique(df$analyte))
+  
+    # Specify event colors and types
+    event_colors <- c("Inflow" = "#E69F00", "Outflow" = "#56B4E9", "Point Sample" = "#009E73")
+    event_types <- c("Inflow", "Outflow", "Point Sample")
+    
+    create_buttons <- function(y_axis_var_name) {
+      analyte_data <- df[df$analyte == y_axis_var_name, ]
+      y_data <- analyte_data$result
+      
+      y_range <- range(y_data)
+      buffer_factor <- 0.1  # Set your desired buffer factor
+      y_range_with_buffer <- y_range + diff(y_range) * c(-buffer_factor, buffer_factor)
+      
+      list(
+        method = 'restyle',
+        args = list('y', list(y_data)),
+        label = y_axis_var_name,
+        args2 = list('yaxis.range', y_range_with_buffer)  # Update y-axis range
+      )
+    }
+    
+    # Create a scatter plot with the first analyte's data
+    first_analyte <- y_axis_var_names[1]
+    first_analyte_data <- df[df$analyte == first_analyte, ]
+    first_analyte_y_range <- create_buttons(first_analyte)
+    
+    initial_y_data <- first_analyte_data$result
+    initial_y_range <- range(initial_y_data)
+    buffer_factor <- 0.1
+    initial_y_range_with_buffer <- initial_y_range + diff(initial_y_range) * c(-buffer_factor, buffer_factor)
+    
+    location_scatter_plot <- plot_ly(data = df, x = ~collected, y = ~result,
+                                     color = ~event.type, colors = event_colors,
+                                     type = 'scatter', mode = 'markers',
+                                     marker = list(size = 8, opacity = 0.6),
+                                     legendgroup = ~event.type,
+                                     showlegend = TRUE) %>%
+      layout(
+        title = paste("Scatter plot for Location:", selected_location),
+        xaxis = list(title = "Collected", tickformat = "%m/%d/%y"),  # Format the date as MM/DD/YY
+        yaxis = list(title = "Result", rangeslider = list()),  # Add rangeslider
+        showlegend = TRUE,
+        updatemenus = list(
+          list(
+            buttons = lapply(y_axis_var_names, create_buttons)
+          )
+        )
+      )
+    
+    return(location_scatter_plot)
+    
+  }, error = function(e) {
+    cat("An error occurred:", conditionMessage(e))
+    return(NULL)
+  })
+}
+
+create_scatterplot(filtered_df, loc)
+
+```
+**To save your plot as a PNG:** hover over the top right corner and click
+the camera icon.  The PNG will be saved in your downloads folder.
+
+
+# Scatterplot Matrix of All Numerical Analyte Data
+Use the below scatter matrix to look at potential relationships between
+numerical variables.
+
+```{r, warning=FALSE}
+create_scatterplot_matrix <- function(df, location_name) {
+  
+  tryCatch({
+    #special filtering for scatterplot matrix, different from above
+    filtered_data <- df %>%
+      mutate(sample.id = gsub("-[1-5]$", "", sample.id), # remove -1 to -5 at the end of strings 
+             sample.id = gsub("-[1-5]-D$", "-D", sample.id),  # do the same for duplicates
+             sample.id = gsub("-2,3,5", "", sample.id)) %>%  # remove special case of "-2,3,5"
+      select(sample.id, result, analyte, event.type)
+
+    # Pivot the data wider with aggregation of duplicates by mean
+    pivoted_data <- filtered_data %>%
+      tidyr::pivot_wider(
+        names_from = analyte,
+        values_from = result,
+        values_fn = list(result = mean)  # Specify how to aggregate duplicates
+      )
+
+    # raise error if no data provided
+    if (nrow(pivoted_data) == 0) {
+      stop("No data available for the given location.")
+    }
+
+    # Exclude the first two columns (sample.id and event.type)
+    analyte_columns <- colnames(pivoted_data)[-c(1, 2)]  
+
+    # Create scatterplot matrix using pairs()
+    pairs(pivoted_data[, analyte_columns],
+          labels = analyte_columns,
+          col = as.numeric(factor(pivoted_data$event.type)),
+          pch = 19)
+
+    # TODO: create scatter matrix using PerformanceAnalytics package
+    # chart.Correlation(pd2,
+    #                 histogram = T,
+    #                 method = 'pearson',
+    #                 pch = 8
+    #                 )
+  }, error = function(e) {
+    cat("An error occurred when producing the scatter matrix:",
+        conditionMessage(e))
+  })
+}
+
+create_scatterplot_matrix(filtered_df, loc)
+```
+
+# Static Box and Whisker Plots
+```{r, fig.height=20, fig.width=12}
+create_and_save_boxwhisker_plot <- function(df, output_dir, file_name, plot.title) {
+  tryCatch({
+    # Ensure the output directory exists
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    # Create the file path
+    file_path <- file.path(output_dir, file_name)
+    
+    # Generate the box and whisker plot
+    bw_plot <- ggplot(df, aes(x = factor(event.type), y = result, fill = factor(event.type))) +
+      geom_boxplot(#outlier.shape = NA, # Hide outliers for clarity
+                   position = position_dodge(0)
+                   ) + 
+      geom_jitter(width = 0.2, size = 1.5, alpha = 0.6) + # Add jitter to show individual data points
+      facet_grid(analyte ~ event.count, scales = "free_y", space = "free_x") +
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 14), # Increase x axis text size
+        axis.text.y = element_text(size = 14), # Increase y axis text size
+        axis.title = element_text(size = 16), # Increase axis title text size
+        strip.text = element_text(size = 16), # Increase facet strip text size
+        legend.text = element_text(size = 14), # Increase legend text size
+        legend.title = element_text(size = 16), # Increase legend title size
+        plot.title = element_text(size = 20, hjust = 0.5), # Increase plot title size
+        plot.subtitle = element_text(size = 18), # Increase plot subtitle size
+        plot.caption = element_text(size = 12), # Increase plot caption size
+        strip.background = element_rect(colour = "black", fill = "white"),
+        panel.grid.major = element_line(size = 1), # Increase major grid line size
+        panel.grid.minor = element_line(size = 0.5) # Increase minor grid line size
+        )+
+      labs(title = plot.title, x = "Event Type", y = "Result", fill = "Event Type") +
+      scale_fill_brewer(palette = "Pastel1") # Colorblind-friendly palette
+    
+    # Save the plot as a PNG file
+    ggsave(file_path, bw_plot, width = 8, height = 12, units = "in")
+    
+    # Return the plot object for rendering in the HTML document
+    return(bw_plot)
+  }, error = function(e) {
+    message("An error occurred in create_and_save_boxwhisker_plot: ", e$message)
+    return(e$message) # Return error message
+  })
+}
+
+bw_N <- create_and_save_boxwhisker_plot(N_df,
+                                        output_dir = "./site_selector_temporary_results",
+                                        file_name = "bw_N.jpg",
+                                        plot.title = 'Forms of Nitrogen')
+bw_P <- create_and_save_boxwhisker_plot(P_df,
+                                        output_dir = "./site_selector_temporary_results",
+                                        file_name = "bw_P.jpg",
+                                        plot.title = 'Forms of Phosphorous')
+bw_Misc <- create_and_save_boxwhisker_plot(Misc_df,
+                                            output_dir = "./site_selector_temporary_results",
+                                            file_name = "bw_Misc.jpg",
+                                        plot.title = 'Water Quality Analytes')
+
+bw_N
+bw_P
+bw_Misc
+
+```
+
+# Static Bar Plots
+```{r, fig.height=20, fig.width=12}
+create_and_save_bar_plot <- function(df, output_dir, file_name, plot.title) {
+  tryCatch({
+    # Ensure the output directory exists
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    # Summarize the data
+    summary_df <- df %>%
+      group_by(event.type, analyte, event.count) %>%
+      summarize(mean = mean(result, na.rm = TRUE),
+                sd = sd(result, na.rm = TRUE),
+                .groups = 'drop')
+
+    # Create the file path
+    file_path <- file.path(output_dir, file_name)
+    
+    # Generate the bar plot with error bars
+    bar_plot <- ggplot(summary_df, aes(x = factor(event.type), y = mean, fill = factor(event.type))) +
+      geom_bar(stat = "identity", position = position_dodge(0), color = 'black') +
+      geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.2, position = position_dodge(0)) +
+      facet_grid(analyte ~ event.count, scales = "free_y", space = "free_x") +
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 14), # Increase x axis text size
+        axis.text.y = element_text(size = 14), # Increase y axis text size
+        axis.title = element_text(size = 16), # Increase axis title text size
+        strip.text = element_text(size = 16), # Increase facet strip text size
+        legend.text = element_text(size = 14), # Increase legend text size
+        legend.title = element_text(size = 16), # Increase legend title size
+        plot.title = element_text(size = 20, hjust = 0.5), # Increase plot title size
+        plot.subtitle = element_text(size = 18), # Increase plot subtitle size
+        plot.caption = element_text(size = 12), # Increase plot caption size
+        strip.background = element_rect(colour = "black", fill = "white"),
+        panel.grid.major = element_line(size = 1), # Increase major grid line size
+        panel.grid.minor = element_line(size = 0.5) # Increase minor grid line size
+        )+
+      labs(title = plot.title, x = "Event Type", y = "Result", fill = "Event Type") +
+      scale_fill_brewer(palette = "Pastel1") # Colorblind-friendly palette
+
+    # Save the plot as a PNG file
+    ggsave(file_path, bar_plot, width = 8, height = 12, units = "in")
+    
+    # Return the plot object for rendering in the HTML document
+    return(bar_plot)
+  }, error = function(e) {
+    message("An error occurred in create_and_save_bar_plot: ", e$message)
+    return(e$message) # Return error message
+  })
+}
+
+bar_N <- create_and_save_bar_plot(N_df,
+                                  output_dir = "./site_selector_temporary_results",
+                                  file_name = "bar_N.jpg",
+                                  plot.title = 'Forms of Nitrogen')
+bar_P <- create_and_save_bar_plot(P_df,
+                                  output_dir = "./site_selector_temporary_results",
+                                  file_name = "bar_P.jpg",
+                                  plot.title = 'Forms of Phosphorus')
+bar_Misc <- create_and_save_bar_plot(Misc_df,
+                                     output_dir = "./site_selector_temporary_results",
+                                     file_name = "bar_Misc.jpg",
+                                    plot.title = 'Water Quality Analytes')
+
+bar_N
+bar_P
+bar_Misc
+```
+
+
+# Raw Data
+Use the table below to look at raw values.
+```{r}
+datatable(filtered_df)
+```

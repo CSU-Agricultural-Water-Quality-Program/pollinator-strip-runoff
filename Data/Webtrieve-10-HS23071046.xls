@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:x='urn:schemas-microsoft-com:office:excel' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style>
+
+</style>
+<!--[if gte mso 9]>
+
+<![endif]-->
+</head>
+<body>
+	<div id="ctl00_CPH_CorpWideWrapper_ucWorkorder_ucWorkorderResults_ucWorkorderResultsBySample_RG_WorkorderResultsBySample_GridData" class="rgDataDiv" style="position:relative;overflow-x:auto;overflow-y:auto;width:100%;height:500px;">
+
+<table class=" rgClipCells" rules="cols" border="1" id="ctl00_CPH_CorpWideWrapper_ucWorkorder_ucWorkorderResults_ucWorkorderResultsBySample_RG_WorkorderResultsBySample_ctl00" style="width:100%;table-layout:fixed;overflow:hidden;empty-cells:show;">
+	<thead>
+		<tr>
+			<th scope="col">SAMPLE ID</th><th scope="col">LAB ID</th><th scope="col">METHOD</th><th scope="col">CAS NUMBER</th><th scope="col">ANALYTE</th><th scope="col">RESULT</th><th scope="col">UNITS</th><th scope="col">DILUTION</th><th scope="col">RESULT REPORTED TO</th><th scope="col">MDL</th><th scope="col">RL</th><th scope="col">REPORT BASIS</th><th scope="col">PERCENT MOISTURE</th><th scope="col">PERCENT SOLID</th>
+		</tr>
+	</thead><tbody>
+	<tr>
+		<td>Sample: A2-01-OT-ISC / HS23071046-04</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+	</tr><tr>
+		<td>A2-01-OT-ISC</td><td>HS23071046-04</td><td>M4500 NH3 D - TKN_W 4500NH3 D</td><td>7727-37-9TKN</td><td>Nitrogen, Total Kjeldahl</td><td style="background-color:#74BDFB;mso-number-format:\@;">16</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.1</td><td>0.5</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-OT-ISC</td><td>HS23071046-04</td><td>E300 - 300_W</td><td>14797-55-8</td><td>Nitrogen, Nitrate (As N)</td><td style="background-color:#74BDFB;mso-number-format:\@;">3.27</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.03</td><td>0.1</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-OT-ISC</td><td>HS23071046-04</td><td>E300 - 300_W</td><td>14797-65-0</td><td>Nitrogen, Nitrite  (As N)</td><td style="mso-number-format:\@;">&lt;0.100</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.03</td><td>0.1</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-OT-ISC</td><td>HS23071046-04</td><td>SM4500P E - P-Ortho M4500P E</td><td>7723-14-0</td><td>Phosphorus, Total Orthophosphate (as P)</td><td style="background-color:#74BDFB;mso-number-format:\@;">0.334</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.01</td><td>0.05</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-OT-ISC</td><td>HS23071046-04</td><td>SM4500P E - P_TW M4500P E</td><td>7723-14-0</td><td>Phosphorus, Total (As P)</td><td style="background-color:#74BDFB;mso-number-format:\@;">0.556</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.02</td><td>0.05</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-OT-ISC</td><td>HS23071046-04</td><td>E160.1 - TDS_W_160.1</td><td>TDS</td><td>Total Dissolved Solids (Residue, Filterable)</td><td style="background-color:#74BDFB;mso-number-format:\@;">1400</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>5</td><td>10</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>Sample: BK-A2-01 / HS23071046-05</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+	</tr><tr>
+		<td>BK-A2-01</td><td>HS23071046-05</td><td>M4500 NH3 D - TKN_W 4500NH3 D</td><td>7727-37-9TKN</td><td>Nitrogen, Total Kjeldahl</td><td style="background-color:#74BDFB;mso-number-format:\@;">3.9</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.1</td><td>0.5</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>BK-A2-01</td><td>HS23071046-05</td><td>E300 - 300_W</td><td>14797-55-8</td><td>Nitrogen, Nitrate (As N)</td><td style="mso-number-format:\@;">&lt;0.100</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.03</td><td>0.1</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>BK-A2-01</td><td>HS23071046-05</td><td>E300 - 300_W</td><td>14797-65-0</td><td>Nitrogen, Nitrite  (As N)</td><td style="mso-number-format:\@;">&lt;0.100</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.03</td><td>0.1</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>BK-A2-01</td><td>HS23071046-05</td><td>SM4500P E - P-Ortho M4500P E</td><td>7723-14-0</td><td>Phosphorus, Total Orthophosphate (as P)</td><td style="mso-number-format:\@;">&lt;0.0500</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.01</td><td>0.05</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>BK-A2-01</td><td>HS23071046-05</td><td>SM4500P E - P_TW M4500P E</td><td>7723-14-0</td><td>Phosphorus, Total (As P)</td><td style="mso-number-format:\@;">&lt;0.0500</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.02</td><td>0.05</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>BK-A2-01</td><td>HS23071046-05</td><td>E160.1 - TDS_W_160.1</td><td>TDS</td><td>Total Dissolved Solids (Residue, Filterable)</td><td style="mso-number-format:\@;">&lt;10.0</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>5</td><td>10</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>Sample: A2-01-IN-ISC / HS23071046-06</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+	</tr><tr>
+		<td>A2-01-IN-ISC</td><td>HS23071046-06</td><td>M4500 NH3 D - TKN_W 4500NH3 D</td><td>7727-37-9TKN</td><td>Nitrogen, Total Kjeldahl</td><td style="background-color:#74BDFB;mso-number-format:\@;">8.7</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.1</td><td>0.5</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-IN-ISC</td><td>HS23071046-06</td><td>E300 - 300_W</td><td>14797-55-8</td><td>Nitrogen, Nitrate (As N)</td><td style="background-color:#74BDFB;mso-number-format:\@;">2.25</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.03</td><td>0.1</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-IN-ISC</td><td>HS23071046-06</td><td>E300 - 300_W</td><td>14797-65-0</td><td>Nitrogen, Nitrite  (As N)</td><td style="mso-number-format:\@;">&lt;0.100</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.03</td><td>0.1</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-IN-ISC</td><td>HS23071046-06</td><td>SM4500P E - P-Ortho M4500P E</td><td>7723-14-0</td><td>Phosphorus, Total Orthophosphate (as P)</td><td style="background-color:#74BDFB;mso-number-format:\@;">0</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.01</td><td>0.05</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-IN-ISC</td><td>HS23071046-06</td><td>SM4500P E - P_TW M4500P E</td><td>7723-14-0</td><td>Phosphorus, Total (As P)</td><td style="background-color:#74BDFB;mso-number-format:\@;">0.321</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>0.02</td><td>0.05</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr><tr>
+		<td>A2-01-IN-ISC</td><td>HS23071046-06</td><td>E160.1 - TDS_W_160.1</td><td>TDS</td><td>Total Dissolved Solids (Residue, Filterable)</td><td style="background-color:#74BDFB;mso-number-format:\@;">4560</td><td>mg/L</td><td style="mso-number-format:0\.00;">1</td><td>RL</td><td>5</td><td>10</td><td>&nbsp;</td><td>&nbsp;</td><td>N/A</td>
+	</tr>
+	</tbody>
+
+</table>	</div>
+</body></html>
