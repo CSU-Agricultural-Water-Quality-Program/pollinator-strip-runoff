@@ -10,6 +10,16 @@ A.J. Brown, Agricultural Data Scientist <br/>
 Christina Welch, Project Coordinator <br/>
 Troy Bauder, Project Advisor  
 
+## Table of Contents
+- [Problem Statement and Opportunity](#problem-statement-and-opportunity)
+- [Approach](#approach)
+  * [Study Site: CSU ARDEC](#study-site-csu-ardec)
+  * [Experimental Method: Establishing Pollinator Species](#experimental-method-establishing-pollinator-species)
+  * [Experimental Method: Field Sample Collection](#experimental-method-field-sample-collection)
+  * [Experimental Method: Data Analysis](#experimental-method-data-analysis)
+- [Results](#results)
+- [Conclusion](#conclusion)
+
 ## Problem Statement and Opportunity
 Colorado corn producers have long recognized the need to utilize practices that benefit both economic and environmental sustainability.  In fact, many Colorado corn growers are already using a diverse set of practices that better match the nutrient needs of the crop, reduce environmental impacts, and increase profitability.
 
