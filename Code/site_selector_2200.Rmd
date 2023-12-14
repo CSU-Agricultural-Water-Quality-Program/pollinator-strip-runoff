@@ -1,0 +1,465 @@
+---
+title: "Site selector data visualization tool"
+author: "Molly 'Caz' Bell and A.J. Brown using R version 4.2.2"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    output_dir: "site_selector_temporary_results"
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: no
+---
+The following is an interactive data report containing water quality data from 
+samples taken by the Colorado State University (CSU) Agriculture Water Quality 
+Program (AWQP) at a location selected by the user when running the script
+(reported below). For more information, please contact A.J. Brown at
+Ansley.Brown@colostate.edu or visit the CSU AWQP Website at 
+https://waterquality.colostate.edu.
+
+**Please Note:** All analytes are reported in mg/L *EXCEPT*
+selenium (reported in ug/L), specific electrical conductivity (EC; mS/cm), and
+pH (log H).
+
+## Special Notes
+
+*	All “0” values reported are non-detects (ND) reported by ALS
+*	Total suspended solids (TSS), Electrical Conductivity (EC), and pH are performed by AWQP staff at CSU, whereas all other analytes are reported by ALS Laboratories
+*	Methods used to derive each analyte can be found in the Raw Data table in the “method” column
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# set working dir
+knitr::opts_knit$set(root.dir = here::here())
+   # sets the working directory to where the project file is
+```
+
+```{r, include=FALSE}
+# load required packages
+package.list <- c('plotly',
+                  'dplyr',
+                  'tidyr',
+                  'DT',
+                  'ggplot2',
+                  'stringr'
+                  # 'gridExtra',
+                  # 'GGally',
+                  # 'PerformanceAnalytics'
+                  )
+packageLoad <- function(packages){
+  for (i in packages) {
+    if (!require(i, character.only = TRUE)) {
+      install.packages(i, repos = "http://cran.us.r-project.org")
+      library(i, character.only = TRUE)
+    }
+  }
+}
+packageLoad(package.list)
+```
+
+```{r, include=FALSE}
+# # Uploading file-merge code to create data frame
+source('./Code/file-merger.R')
+# # create data frame
+#   # note that directory is defined in file_merger.R file
+#   # change data file path in that script to modify the data source
+# dat <- returnAllFiles(d = directory, export = TRUE)
+
+# import 2200 data manually for this report from the python scrip
+dat <- read.csv('./Report/merged_data.csv', header = TRUE, stringsAsFactors = FALSE)
+dat2 <- dat
+
+```
+
+```{r}
+# some more data cleaning prior to filtered df
+
+# create an uppercase copy of sample.id for processData
+dat$SAMPLE.ID <- dat$sample.id
+
+# change all 2200 names to 'ARDEC'
+dat$location.name[dat$location.name == '2200'] <- 'ARDEC'
+unique(dat$location.name)
+
+# run processData again to make sure event.type is correct
+dat <- processData(dat)
+
+# drop all event.types that are Point Samples
+dat <- dat[dat$event.type != 'Point Sample',]
+
+# make result numeric
+dat$result <- as.numeric(dat$result)
+
+# drop all rows where 'result' is NA
+dat <- dat[!is.na(dat$result),]
+
+# create new year column based on collected column and make it a factor
+dat$year <- format(as.Date(dat$collected, format = "%m/%d/%Y"), "%Y")
+```
+
+
+```{r, include=FALSE}
+# Site list
+  # To select site, un-comment your location of interest (alphabetical order)
+  # This list may need to be updated as more sites are added/removed
+ loc = 'ARDEC' #temporarily ARDEC 2200 until I fix file-merger.r
+# loc = 'AVRC STAR'
+# loc = 'Barley'
+# loc = 'Berthoud'
+# loc = 'Big Hollow'
+# loc = 'Boulder Lake'
+# loc = 'Below Stagecoach Dam'
+# loc = 'Gunnison'
+# loc = 'Kerbel'
+# loc = 'Legacy'
+# loc = 'Molina'
+# loc = 'Morrison Creek'
+# loc = 'Stage Coach Above'
+# loc = 'Stage Coach In'
+# loc = 'Stagecoach'
+# loc = 'The Ranch'
+# loc = 'Upper Yampa'
+# loc = 'Yellow Jacket'
+
+#create a filtered df to use for violin plots and scatterplot
+filter_dataframe <- function(df, selected_location, include_blanks = FALSE) {
+  if (include_blanks) {
+    filtered_df <- df %>% filter(location.name == selected_location)
+  } else {
+    filtered_df <- df %>% filter(location.name == selected_location & event.type != "Lab Blank")
+  }
+  return(filtered_df)
+}
+
+# Create df and exclude blanks by default:
+filtered_df <- filter_dataframe(dat, loc, include_blanks = FALSE)
+```
+
+
+## Location Selected: <span style="color:#4CAF50">`r loc` 2200</span>
+
+```{r, include=FALSE}
+# function to save site data as csv
+csv_data <- function(df, location_name) {
+  location_data <- df %>%
+    filter(location.name == location_name)
+  #create output folder
+  folder_name <- "site_selector_temporary_results"
+  if (!file.exists(folder_name)) {
+    dir.create(folder_name)
+  }
+  
+  file_name <- paste0(folder_name, "/", location_name, "_data_", format(Sys.Date(), "%Y-%m-%d"), ".csv")
+  write.csv(location_data, file = file_name, row.names = FALSE)
+  return(file_name)
+}
+# use the function to save
+file = csv_data(filtered_df, loc)
+```
+
+```{r}
+# Abbreviating analyte names
+filtered_df <- filtered_df %>%
+  mutate(analyte_abbrev = case_when(
+    analyte == "Nitrogen, Nitrate (As N)" ~ "NO3-N",
+    analyte == "Nitrogen, Total Kjeldahl" ~ "TKN",
+    analyte == "Phosphorus, Total (As P)" ~ "P-Total",
+    analyte == "Selenium, Total" ~ "Se",
+    analyte == "Phosphorus, Total Orthophosphate (as P)" ~ "Ortho-P",
+    analyte == "Nitrogen, Nitrite  (As N)" ~ "N-NO2",
+    analyte == "Total Dissolved Solids (Residue, Filterable)" ~ "TDS",
+    analyte == "pH" ~ "pH",
+    analyte == "Suspended Solids (Residue, Non-Filterable)" ~ "TSS",
+    analyte == "Specific Conductance" ~ "EC",
+    TRUE ~ analyte # Default case to keep original name if no match
+  ))
+
+```
+
+
+```{r}
+# Creating some subset data for static graphing later
+analytes_plot1 <- c("Nitrogen, Nitrate (As N)", 
+                    "Nitrogen, Nitrite  (As N)", # note the extra space before "(" due to ALS formatting
+                    "Nitrogen, Total Kjeldahl")
+analytes_plot2 <- c("Phosphorus, Total (As P)", 
+                    "Phosphorus, Total Orthophosphate (as P)",
+                    "Suspended Solids (Residue, Non-Filterable)")
+analytes_plot3 <- setdiff(unique(filtered_df$analyte), c(analytes_plot1, analytes_plot2))
+N_df <- filtered_df %>% filter(analyte %in% analytes_plot1)
+P_df <- filtered_df %>% filter(analyte %in% analytes_plot2)
+Misc_df <- filtered_df %>% filter(analyte %in% analytes_plot3)
+```
+
+### CSV Export of selected site data saved as: 
+`r file`
+
+# Water Analytes Present and Methods Used for Determination:
+```{r}
+unique_analyte_method <- filtered_df %>%
+  select(analyte, method) %>%
+  distinct(analyte, method) %>%
+  arrange(analyte)
+
+# Print the table
+datatable(unique_analyte_method, 
+              caption = "Unique Analytes and Corresponding Methods")
+
+```
+
+
+# Static Box and Whisker Plots
+```{r, fig.height=20, fig.width=12}
+create_and_save_boxwhisker_plot <- function(df, output_dir, file_name, plot.title) {
+  tryCatch({
+    # Ensure the output directory exists
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    # Create the file path
+    file_path <- file.path(output_dir, file_name)
+    
+    # Generate the box and whisker plot
+    bw_plot <- ggplot(df, aes(x = factor(event.type), y = result, fill = factor(event.type))) +
+      geom_boxplot(#outlier.shape = NA, # Hide outliers for clarity
+                   position = position_dodge(0)
+                   ) + 
+      geom_jitter(width = 0.2, size = 1.5, alpha = 0.6) + # Add jitter to show individual data points
+      facet_grid(analyte_abbrev ~ event.count, scales = "free_y", space = "free_x") +
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 14), # Increase x axis text size
+        axis.text.y = element_text(size = 14), # Increase y axis text size
+        axis.title = element_text(size = 16), # Increase axis title text size
+        strip.text = element_text(size = 16), # Increase facet strip text size
+        legend.text = element_text(size = 14), # Increase legend text size
+        legend.title = element_text(size = 16), # Increase legend title size
+        plot.title = element_text(size = 20, hjust = 0.5), # Increase plot title size
+        plot.subtitle = element_text(size = 18), # Increase plot subtitle size
+        plot.caption = element_text(size = 12), # Increase plot caption size
+        strip.background = element_rect(colour = "black", fill = "white"),
+        panel.grid.major = element_line(size = 1), # Increase major grid line size
+        panel.grid.minor = element_line(size = 0.5) # Increase minor grid line size
+        )+
+      labs(title = plot.title, x = "Event Type", y = "Result", fill = "Event Type") +
+      scale_fill_brewer(palette = "Pastel1") # Colorblind-friendly palette
+    
+    # Save the plot as a PNG file
+    ggsave(file_path, bw_plot, width = 12, height = 8, units = "in")
+    
+    # Return the plot object for rendering in the HTML document
+    return(bw_plot)
+  }, error = function(e) {
+    message("An error occurred in create_and_save_boxwhisker_plot: ", e$message)
+    return(e$message) # Return error message
+  })
+}
+
+bw_N <- create_and_save_boxwhisker_plot(N_df,
+                                        output_dir = "./site_selector_temporary_results",
+                                        file_name = "bw_N.jpg",
+                                        plot.title = 'Forms of Nitrogen')
+bw_P <- create_and_save_boxwhisker_plot(P_df,
+                                        output_dir = "./site_selector_temporary_results",
+                                        file_name = "bw_P.jpg",
+                                        plot.title = 'Forms of Phosphorous')
+bw_Misc <- create_and_save_boxwhisker_plot(Misc_df,
+                                            output_dir = "./site_selector_temporary_results",
+                                            file_name = "bw_Misc.jpg",
+                                        plot.title = 'Water Quality Analytes')
+
+bw_N
+bw_P
+bw_Misc
+
+```
+
+# Static Bar Plots
+```{r, fig.height=20, fig.width=12}
+create_and_save_bar_plot <- function(df, output_dir, file_name, plot.title) {
+  tryCatch({
+    # Ensure the output directory exists
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    # Summarize the data
+    summary_df <- df %>%
+      group_by(event.type, analyte_abbrev, event.count) %>%
+      summarize(mean = mean(result, na.rm = TRUE),
+                sd = sd(result, na.rm = TRUE),
+                .groups = 'drop')
+
+    # Create the file path
+    file_path <- file.path(output_dir, file_name)
+    
+    # Generate the bar plot with error bars
+    bar_plot <- ggplot(summary_df, aes(x = factor(event.type), y = mean, fill = factor(event.type))) +
+      geom_bar(stat = "identity", position = position_dodge(0), color = 'black') +
+      geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.2, position = position_dodge(0)) +
+      facet_grid(analyte_abbrev ~ event.count, scales = "free_y", space = "free_x") +
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 14), # Increase x axis text size
+        axis.text.y = element_text(size = 14), # Increase y axis text size
+        axis.title = element_text(size = 16), # Increase axis title text size
+        strip.text = element_text(size = 16), # Increase facet strip text size
+        legend.text = element_text(size = 14), # Increase legend text size
+        legend.title = element_text(size = 16), # Increase legend title size
+        plot.title = element_text(size = 20, hjust = 0.5), # Increase plot title size
+        plot.subtitle = element_text(size = 18), # Increase plot subtitle size
+        plot.caption = element_text(size = 12), # Increase plot caption size
+        strip.background = element_rect(colour = "black", fill = "white"),
+        panel.grid.major = element_line(size = 1), # Increase major grid line size
+        panel.grid.minor = element_line(size = 0.5) # Increase minor grid line size
+        )+
+      labs(title = plot.title, x = "Event Type", y = "Result", fill = "Event Type") +
+      scale_fill_brewer(palette = "Pastel1") # Colorblind-friendly palette
+
+    # Save the plot as a PNG file
+    ggsave(file_path, bar_plot, width = 12, height = 8, units = "in")
+    
+    # Return the plot object for rendering in the HTML document
+    return(bar_plot)
+  }, error = function(e) {
+    message("An error occurred in create_and_save_bar_plot: ", e$message)
+    return(e$message) # Return error message
+  })
+}
+
+bar_N <- create_and_save_bar_plot(N_df,
+                                  output_dir = "./site_selector_temporary_results",
+                                  file_name = "bar_N.jpg",
+                                  plot.title = 'Forms of Nitrogen')
+bar_P <- create_and_save_bar_plot(P_df,
+                                  output_dir = "./site_selector_temporary_results",
+                                  file_name = "bar_P.jpg",
+                                  plot.title = 'Forms of Phosphorus')
+bar_Misc <- create_and_save_bar_plot(Misc_df,
+                                     output_dir = "./site_selector_temporary_results",
+                                     file_name = "bar_Misc.jpg",
+                                    plot.title = 'Water Quality Analytes')
+
+bar_N
+bar_P
+bar_Misc
+```
+
+# Static Bar Plots by Year
+```{r}
+create_and_save_bar_plot_year <- function(df, output_dir, file_name, plot.title) {
+  tryCatch({
+    # Ensure the output directory exists
+    if (!dir.exists(output_dir)) {
+      dir.create(output_dir, recursive = TRUE)
+    }
+    
+    # Assuming 'year' column is present in the df
+    # If not, you might need to create it from a date column
+    
+    # Summarize the data
+    summary_df <- df %>%
+      group_by(year, analyte_abbrev, event.type) %>%
+      summarize(mean = mean(result, na.rm = TRUE),
+                sd = sd(result, na.rm = TRUE),
+                .groups = 'drop')
+
+    # Create the file path
+    file_path <- file.path(output_dir, file_name)
+    
+    # Generate the bar plot with error bars
+    bar_plot <- ggplot(summary_df, aes(x = factor(year), y = mean, fill = factor(event.type))) +
+      geom_bar(stat = "identity", position = position_dodge(1), color = 'black') + # Adjusted position for side-by-side bars
+      geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = 0.2, position = position_dodge(1)) + # Adjust position for error bars
+      facet_grid(analyte_abbrev ~ ., scales = "free_y", space = "free_x") +
+      theme_minimal() +
+      theme(
+        axis.text.x = element_text(angle = 45, hjust = 1, size = 14), # Increase x axis text size
+        axis.text.y = element_text(size = 14), # Increase y axis text size
+        axis.title = element_text(size = 16), # Increase axis title text size
+        strip.text = element_text(size = 16), # Increase facet strip text size
+        legend.text = element_text(size = 14), # Increase legend text size
+        legend.title = element_text(size = 16), # Increase legend title size
+        plot.title = element_text(size = 20, hjust = 0.5), # Increase plot title size
+        plot.subtitle = element_text(size = 18), # Increase plot subtitle size
+        plot.caption = element_text(size = 12), # Increase plot caption size
+        strip.background = element_rect(colour = "black", fill = "white"),
+        panel.grid.major = element_line(size = 1), # Increase major grid line size
+        panel.grid.minor = element_line(size = 0.5) # Increase minor grid line size
+        ) +
+      labs(title = plot.title, x = "Year", y = "Result", fill = "Event Type") +
+      scale_fill_brewer(palette = "Pastel1") # Colorblind-friendly palette
+
+    # Save the plot as a PNG file
+    ggsave(file_path, bar_plot, width = 12, height = 8, units = "in")
+    
+    # Return the plot object for rendering in the HTML document
+    return(bar_plot)
+  }, error = function(e) {
+    message("An error occurred in create_and_save_bar_plot: ", e$message)
+    return(e$message) # Return error message
+  })
+}
+
+
+bar_N_byYear <- create_and_save_bar_plot_year(N_df,
+                                  output_dir = "./site_selector_temporary_results",
+                                  file_name = "bar_N_year.jpg",
+                                  plot.title = 'Forms of Nitrogen')
+bar_P_byYear <- create_and_save_bar_plot_year(P_df,
+                                  output_dir = "./site_selector_temporary_results",
+                                  file_name = "bar_P_year.jpg",
+                                  plot.title = 'Forms of Phosphorus')
+bar_Misc_byYear <- create_and_save_bar_plot_year(Misc_df,
+                                     output_dir = "./site_selector_temporary_results",
+                                     file_name = "bar_Misc_year.jpg",
+                                    plot.title = 'Water Quality Analytes')
+
+bar_N_byYear
+bar_P_byYear
+bar_Misc_byYear
+
+```
+
+
+```{r}
+# calculate differences between inflow and outflow values for each analyte, event.count, and year
+
+# calculate summary stats and differences between years
+summary_df <- filtered_df %>%
+  group_by(year, analyte, event.type) %>%
+  summarize(mean_result = mean(result, na.rm = TRUE),
+            sd = sd(result, na.rm = TRUE),
+            .groups = 'drop')
+summary_df
+
+# Creating inflow and outflow DataFrames
+inflow_df <- summary_df %>% filter(event.type == "Inflow")
+outflow_df <- summary_df %>% filter(event.type == "Outflow")
+
+# Renaming columns in inflow_df for clarity
+inflow_df <- inflow_df %>% rename(mean_inflow = mean_result, sd_inflow = sd)
+
+# Renaming columns in outflow_df for clarity
+outflow_df <- outflow_df %>% rename(mean_outflow = mean_result, sd_outflow = sd)
+
+# Merging the DataFrames
+merged_df <- left_join(inflow_df, outflow_df, by = c("year", "analyte"))
+
+# Calculating the differences
+merged_df <- merged_df %>% 
+  mutate(mean_difference = mean_inflow - mean_outflow,
+         removal_efficiency = (mean_difference / mean_inflow)*100
+         )
+
+merged_df
+```
+
+
+
+# Raw Data
+Use the table below to look at raw values.
+```{r}
+datatable(filtered_df)
+```
