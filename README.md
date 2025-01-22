@@ -71,9 +71,9 @@ Below are a few selected graphs and tables from the report for reference:
 ### Calculating removal efficiency
 Using Equation 1 from the Data Analysis section above, removal efficiency (R%) was calculated for analytes where data was available for all three years of the study for accurate comparison and placed in Table 1.  Additionally, these analytes (NO3-N, TKN, Total-P, and TSS) tend to be some of the more critical analytes for characterizing runoff water environmental impacts.
 
-**Table 1.** Calculation of removal efficiency (%) for NO3-N, TKN, Total-P, and TSS water analytes over the 2021, 2022, and 2023 study years. Also shown are the annual average inflow and outflow concentrations. Standard deviation around each average is shown in parentheses next to the average.
+**Table 1.** Calculation of removal efficiency (R%) for NO3-N, TKN, Total-P, and TSS water analytes over the 2021, 2022, and 2023 study years. Also shown are the annual average inflow and outflow concentrations. Standard deviation around each average is shown in parentheses next to the average.
 
-| Analyte                          | Year | Inflow Concentration Mean (Std) mg/L | Outflow Concentration Mean (Std) mg/L | Removal Efficiency % |
+| Analyte                          | Year | Inflow Concentration Mean (Std), mg/L | Outflow Concentration Mean (Std), mg/L | Removal Efficiency, % |
 |----------------------------------|------|--------------------------------------|---------------------------------------|----------------------|
 | Nitrogen, Nitrate (As N)         | 2021 | 9.1 (0.58)                           | 8.4 (0.87)                            | 8.0                  |
 |                                  | 2022 | 7.7 (0.58)                           | 6.9 (0.85)                            | 10.9                 |
@@ -89,7 +89,7 @@ Using Equation 1 from the Data Analysis section above, removal efficiency (R%) w
 |                                  | 2023 | 1021.7 (77.78)                       | 327.8 (396.03)                        | 67.9                 |
 
 
-**For NO3-N**, the R% increased from 2021 to 2022 (8.0 % to 10.9 %) but decreased dramatically in 2023 (-11.5).  However, these trends are likely statistically insignificant due to the large standard deviations around each mean, which can also be seen in the previous Figure 5. These results indicate that establishing pollinator strips had very little, to a slightly negative impact on NO3-N filtering capacity within the filter strip.
+**For NO3-N**, the R% increased from 2021 to 2022 (8.0 % to 10.9 %) but decreased dramatically in 2023 (-11.5).  However, these trends are likely statistically insignificant due to the large standard deviations around each mean, which can also be seen in the previous Figure 2. These results indicate that establishing pollinator strips had very little, to a slightly negative impact on NO3-N filtering capacity within the filter strip.
 
 **For TKN**, the R% was 28.5 % in 2021, but could not be calculated in 2022 because no TKN was found in the inflow water that year.  In 2023, the removal efficiency decreased to -83.5 %, indicating that the filter strip was contributing to TKN water concentrations.  However, these results are very uncertain, as the 2023 results only had a single water sample, resulting in a lack of any standard deviation.  Because of this, we are not confident in saying that the filter strip is contributing TKN to the runoff water without additional results.
 
