@@ -37,12 +37,17 @@ This pilot project will seek to create a pollinator habitat in an existing filte
 ### Study Site: CSU ARDEC
 An existing filter strip, approximately 0.25 acres in size, was established at the tail edge of a 5.5 acre field at CSU’s Agricultural Research, Development and Education Center (ARDEC) in 2020 and contained meadow brome and orchardgrass (Figure 1). This filter strip significantly reduced significant issues with sediment runoff, and nutrients. The crop rotation for the study field is corn, pinto beans and winter wheat. The field is furrow irrigated utilizing gated pipe and well water. In 2022, the field will be planted to grain corn utilizing appropriate fertilizer BMPs. 
 
-### Experimental Method: Establishing Pollinator Species
-For this research study, our team will add known species of pollinator plants to the established filter strip. The team will select a variety of early, mid, and late season pollinator species as noted in CSU Extension Fact Sheet 5.616. Planting the pollinators will occur in early spring (March-April) after a significant rain event and will involve mowing a portion of the filter strip to reduce plant competition for better establishment.  The newly planted filter strip may need to be irrigated artificially before the first corn irrigation.  If so, this will be accomplished by bringing stock tanks full of water to flood irrigate the strip. 
-
 ![Figure 1. Study field and filter strip layout with automated sampler locations highlighted.](/figures/fig1.png)
 
 **Figure 1.** Study field and filter strip layout with automated sampler locations highlighted. A short (90 sec.) video tour of the site can be found here: https://www.youtube.com/watch?v=O2kjEdDUdSU 
+
+
+### Experimental Method: Establishing Pollinator Species
+For this research study, our team will add known species of pollinator plants to the established filter strip. The team will select a variety of early, mid, and late season pollinator species as noted in CSU Extension Fact Sheet 5.616. Planting the pollinators will occur in early spring (March-April) after a significant rain event and will involve mowing a portion of the filter strip to reduce plant competition for better establishment.  The newly planted filter strip may need to be irrigated artificially before the first corn irrigation.  If so, this will be accomplished by bringing stock tanks full of water to flood irrigate the strip. 
+
+![Figure 2. Study field and filter strip layout with automated sampler locations highlighted.](/figures/pollinator-strips.png)
+
+**Figure 2.** Image of the filter strip with pollinator species established in the vegetative filter strip in 2023.
 
 ### Experimental Method: Field Sample Collection
 Our research team has already installed automated water sampling devices both upstream and downstream of the existing filter strip to measure important water quality parameters (including; Nitrate, Phosphorus, Total Kjeldahl Nitrogen, sediment, OrthoPhosphate, and Total Phosphorous), and thus the effectiveness of the filter strip to reduce the concentration and load of the analytes listed above. Each device consists of a flume to measure water flow, A Teledyne ISCO 6712 portable water sampler, a bubbler to measure water depth, a cellular modem, and a solar-powered battery. During irrigation events, these automated samplers will collect 200 mL water each hour. During storm events, it will sample based on intensity at 200 mL of water per 250 gal of water through the flume.
